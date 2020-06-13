@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -126,6 +127,27 @@ namespace VK.PersonFinder.WebUI.Controllers
         {
             await _signinManager.SignOutAsync();
             return RedirectToAction("Signin");
+        }
+
+        [HttpPost]
+        public IActionResult ExternalLogin(string provider, string returnUrl = null)
+        {
+            var properties = _signinManager.ConfigureExternalAuthenticationProperties(provider, returnUrl);
+            var callBackUrl = Url.Action("ExternalLoginCallback");
+            properties.RedirectUri = callBackUrl;
+            return Challenge(properties, provider);
+        }
+
+        public async Task<IActionResult> ExternalLoginCallback()
+        {
+            var info = await _signinManager.GetExternalLoginInfoAsync();
+            var emailClaim = info.Principal.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email);
+            var user = new IdentityUser { Email = emailClaim.Value, UserName = emailClaim.Value };
+            await _userManager.CreateAsync(user);
+            await _userManager.AddLoginAsync(user, info);
+            await _signinManager.SignInAsync(user, false);
+
+            return RedirectToAction("Search", "PersonFinder");
         }
     }
 }

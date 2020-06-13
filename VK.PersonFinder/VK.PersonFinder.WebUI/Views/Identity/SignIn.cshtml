@@ -1,7 +1,11 @@
 ﻿@model SignInViewModel
+@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<IdentityUser> signinManager;
 
 @{
     ViewData["Title"] = "SignIn";
+
+    var providers = await signinManager.GetExternalAuthenticationSchemesAsync();
 }
 
 <form asp-controller="Identity" asp-action="SignIn" method="post">
@@ -28,4 +32,22 @@
         <button type="submit" class="btn btn-primary">Sign In</button>
     </div>
 
+</form>
+
+<p>
+    You can use your social account to login as well.
+</p>
+
+<form asp-action="ExternalLogin" method="post">
+    <div class="form-group">
+
+        @{
+            foreach (var provider in providers)
+            {
+                <button type="submit" name="provider" value="@provider.Name" class="btn btn-primary">Login with @provider.DisplayName</button>
+            }
+        }
+
+
+    </div>
 </form>

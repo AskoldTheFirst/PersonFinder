@@ -13,6 +13,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using VK.PersonFinder.WebUI.Data;
 using VK.PersonFinder.WebUI.Service;
+using Microsoft.CodeAnalysis.Options;
+using Microsoft.AspNetCore.Authentication.Facebook;
 
 namespace VK.PersonFinder.WebUI
 {
@@ -36,6 +38,7 @@ namespace VK.PersonFinder.WebUI
                 .AddDefaultTokenProviders();
 
             services.Configure<IdentityOptions>(options => {
+
                 options.Password.RequiredLength = 3;
                 options.Password.RequireDigit = true;
                 options.Password.RequireNonAlphanumeric = false;
@@ -53,6 +56,13 @@ namespace VK.PersonFinder.WebUI
                 option.LoginPath = "/Identity/Signin";
                 option.AccessDeniedPath = "/Identity/AccessDenied";
                 option.ExpireTimeSpan = TimeSpan.FromHours(1);
+            });
+
+            services.AddAuthentication()
+                .AddFacebook(options =>
+            {
+                options.AppId = Configuration["FacebookAppId"];
+                options.AppSecret = Configuration["FacebookAppSecret"];
             });
 
             services.Configure<SmtpOptions>(Configuration.GetSection("Smtp"));
