@@ -1,0 +1,31 @@
+﻿@model SignInViewModel
+
+@{
+    ViewData["Title"] = "SignIn";
+}
+
+<form asp-controller="Identity" asp-action="SignIn" method="post">
+
+    @Html.ValidationSummary()
+
+    <div class="form-group col-5">
+        <label class="text-dark col-5" asp-for="UserName"></label>
+        <input type="text" asp-for="UserName" />
+    </div>
+
+    <div class="form-group col-5">
+        <label class="text-dark col-5" asp-for="Password"></label>
+        <input type="text" asp-for="Password" />
+    </div>
+
+    <div class="form-group col-5">
+        <label class="text-dark col-5" asp-for="RemeberMe">Remember me</label>
+        <input type="checkbox" asp-for="RemeberMe" />
+    </div>
+
+    <div class="form-group col-5">
+        <label class="invisible col-5" asp-for="RemeberMe"></label>
+        <button type="submit" class="btn btn-primary">Sign In</button>
+    </div>
+
+</form>
