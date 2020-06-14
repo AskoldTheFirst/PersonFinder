@@ -31,18 +31,6 @@ namespace VK.PersonFinder.WebUI.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (!await _roleManager.RoleExistsAsync(model.Role))
-                {
-                    var role = new IdentityRole { Name = model.Role };
-                    var roleResult = await _roleManager.CreateAsync(role);
-                    if (roleResult.Succeeded)
-                    {
-                        var errors = roleResult.Errors.Select(s => s.Description);
-                        ModelState.AddModelError("Role", string.Join(",", errors));
-                        return View(model);
-                    }
-                }
-
                 if ((await _userManager.FindByEmailAsync(model.Email)) == null)
                 {
                     IdentityUser newUser = new IdentityUser();
@@ -55,8 +43,6 @@ namespace VK.PersonFinder.WebUI.Controllers
 
                     if (result.Succeeded)
                     {
-                        await _userManager.AddToRoleAsync(newUser, model.Role);
-
                         string conformationLink = Url.ActionLink(
                             "ConfirmEmail", "Identity", new { userId = newUser.Id, @token = token });
 
@@ -89,7 +75,7 @@ namespace VK.PersonFinder.WebUI.Controllers
         [HttpGet]
         public async Task<IActionResult> SignUp()
         {
-            SignUpViewModel model = new SignUpViewModel() { Role = "Member"};
+            SignUpViewModel model = new SignUpViewModel();
 
             return View(model);
         }
@@ -107,7 +93,7 @@ namespace VK.PersonFinder.WebUI.Controllers
                 var result = await _signinManager.PasswordSignInAsync(model.UserName, model.Password, model.RemeberMe, false);
                 if (result.Succeeded)
                 {
-                    return RedirectToAction("Index");
+                    return RedirectToAction("Search", "PersonFinder");
                 }
                 else
                 {

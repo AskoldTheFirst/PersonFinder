@@ -15,6 +15,8 @@ using VK.PersonFinder.WebUI.Data;
 using VK.PersonFinder.WebUI.Service;
 using Microsoft.CodeAnalysis.Options;
 using Microsoft.AspNetCore.Authentication.Facebook;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace VK.PersonFinder.WebUI
 {
@@ -37,7 +39,8 @@ namespace VK.PersonFinder.WebUI
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
-            services.Configure<IdentityOptions>(options => {
+            services.Configure<IdentityOptions>(options =>
+            {
 
                 options.Password.RequiredLength = 3;
                 options.Password.RequireDigit = true;
@@ -52,7 +55,8 @@ namespace VK.PersonFinder.WebUI
                 options.SignIn.RequireConfirmedEmail = true;
             });
 
-            services.ConfigureApplicationCookie(option => {
+            services.ConfigureApplicationCookie(option =>
+            {
                 option.LoginPath = "/Identity/Signin";
                 option.AccessDeniedPath = "/Identity/AccessDenied";
                 option.ExpireTimeSpan = TimeSpan.FromHours(1);
@@ -63,6 +67,21 @@ namespace VK.PersonFinder.WebUI
             {
                 options.AppId = Configuration["FacebookAppId"];
                 options.AppSecret = Configuration["FacebookAppSecret"];
+            }).AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+
+                var issuer = Configuration["Tokens:Issuer"];
+                var audience = Configuration["Tokens:Audience"];
+                var key = Configuration["Tokens:Key"];
+
+                options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                {
+                    ValidIssuer = issuer,
+                    ValidAudience = audience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+                };
             });
 
             services.Configure<SmtpOptions>(Configuration.GetSection("Smtp"));
