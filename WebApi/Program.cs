@@ -35,7 +35,6 @@ namespace WebApi
 
             app.UseAuthorization();
 
-
             app.MapControllers();
 
             // To create initial db.
