@@ -16,6 +16,7 @@ export default function Header() {
                 </Navbar.Collapse>
                 <Navbar.Collapse id="basic-navbar-nav2" className="justify-content-end">
                     <Nav className="mr-auto">
+                        {/* [TODO] How to render an image button here? Does bootstrap have some standard button-images? */}
                         <Nav.Link href="#link" disabled={true}>Profile</Nav.Link>
                         <Nav.Link href="#link">Sign In</Nav.Link>
                         <Nav.Link href="#link">Sign Up</Nav.Link>
