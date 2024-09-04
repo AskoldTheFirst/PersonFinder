@@ -11,12 +11,12 @@ export default function Header() {
                     <Nav className="me-auto">
                         <Nav.Link href="#home">Search</Nav.Link>
                         <Nav.Link href="#home">View</Nav.Link>
-                        {/* [TODO] How to place separator? */}
+                        {/* [TO-DO] How to place separator? */}
                     </Nav>
                 </Navbar.Collapse>
                 <Navbar.Collapse id="basic-navbar-nav2" className="justify-content-end">
                     <Nav className="mr-auto">
-                        {/* [TODO] How to render an image button here? Does bootstrap have some standard button-images? */}
+                        {/* [TO-DO] To draw with CSS How to render an image button here? Does bootstrap have some standard button-images? */}
                         <Nav.Link href="#link" disabled={true}>Profile</Nav.Link>
                         <Nav.Link href="#link">Sign In</Nav.Link>
                         <Nav.Link href="#link">Sign Up</Nav.Link>

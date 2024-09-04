@@ -2,7 +2,6 @@
 using WebApi.Database.Entities;
 using MongoDB.Driver;
 using MongoDB.EntityFrameworkCore.Extensions;
-using MongoDB.EntityFrameworkCore.Extensions;
 
 
 namespace WebApi.Database

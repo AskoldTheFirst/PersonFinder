@@ -7,7 +7,7 @@ namespace WebApi
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -31,17 +31,30 @@ namespace WebApi
                 app.UseSwaggerUI();
             }
 
+            app.UseCors(opt =>
+            {
+                opt.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins(new[] { "http://localhost:5003", "http://127.0.0.1:5003" });
+            });
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
 
             app.MapControllers();
 
-            // To create initial db.
+            var scope = app.Services.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<PersonFinderDbContext>();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+            try
             {
                 var client = new MongoClient("mongodb://localhost:27017/");
                 IMongoDatabase database = client.GetDatabase("PersonFinderDb");
                 PersonFinderDbContext.Create(database);
+                await DbInitializer.InitializeAsync(context);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "A problem occurred during migrations.");
             }
 
             app.Run();

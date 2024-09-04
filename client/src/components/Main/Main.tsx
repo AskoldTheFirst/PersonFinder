@@ -1,47 +1,37 @@
 import { useState } from "react";
-import { Form, Row, Col, InputGroup, Button, ListGroup, Table } from "react-bootstrap";
+import { Form, Button, Table } from "react-bootstrap";
 import SearchResult from "./SerachResult";
 import { SearchEntity } from "../../Entities/SearchEntity";
+import http from "../../http";
+import { SearchResultDto } from "../../DTOs/SearchResultDto";
 
 export default function Main() {
-    const [validated, setValidated] = useState(false);
     const [searchState, setSearchState] = useState<SearchEntity>(new SearchEntity());
+    const [searchResult, setSearchResult] = useState<SearchResultDto []>();
 
-    const handleSubmit = (event: any) => {
-        const form = event.currentTarget;
+    const handleSubmit = () => {
+        let clonedState = searchState.clone();
         
-        let clonedState = Object.assign({}, searchState);
-
-        clonedState.isAbilityValid = clonedState.abilityKeyWords.length > 0;
-        clonedState.isCountryValid = clonedState.locationId == 2 && clonedState.country.length > 0;
-        clonedState.isRegionValid = clonedState.locationId == 2 && clonedState.region.length > 0;
+        if (clonedState.isValid()) {
+            http.Search.doSearch(searchState.toDto())
+                .then(r => { setSearchResult(r); console.log('получили'); });
+        }
 
         setSearchState(clonedState);
-        
-
-        // if (form.checkValidity() === false) {
-        //     event.preventDefault();
-        //     event.stopPropagation();
-        // }
-
-        // setValidated(true);
     };
 
     const handleAbilityCheckChanged = (event: any) => {
-        let clonedState = Object.assign({}, searchState);
-
-        // [TODO] - Why does not it work?
-        //let clonedState = { ...searchState };
+        let clonedState = searchState.clone();
 
         switch (event.target.id) {
             case "ability-1":
-                clonedState.abilityId = 1;
+                clonedState.abilityChoice = 1;
                 break;
             case "ability-2":
-                clonedState.abilityId = 2;
+                clonedState.abilityChoice = 2;
                 break;
             case "ability-3":
-                clonedState.abilityId = 3;
+                clonedState.abilityChoice = 3;
                 break;
         }
 
@@ -49,14 +39,16 @@ export default function Main() {
     }
 
     const handleLocationCheckChanged = (event: any) => {
-        let clonedState = Object.assign({}, searchState);
+        let clonedState = searchState.clone();
 
         switch (event.target.id) {
             case "location-1":
-                clonedState.locationId = 1;
+                clonedState.locationChoice = 1;
+                clonedState.validateCountry();
+                clonedState.validateRegion();
                 break;
             case "location-2":
-                clonedState.locationId = 2;
+                clonedState.locationChoice = 2;
                 break;
         }
 
@@ -68,21 +60,20 @@ export default function Main() {
             <span style={{ color: 'midnightblue', fontSize: 20 }}>I am searching for a Person:</span>
             <hr />
             {/* ------------- Ability ----------- */}
-            {/* [TODO] <center> Is this the correct way to center the content? */}
+            {/* [TO-DO] to eliminate. <center> Is this the correct way to center the content? */}
             <center>
                 <Form className="mmm">
                     <Table>
                         <tr>
-                            {/* [TODO] How to shrink the middle column? */}
-                            <td width={'20%'} rowSpan={3}><center><span>who</span></center></td>
-                            <td width={'30%'} rowSpan={3} style={{ paddingLeft: "18px" }}>
+                            <td width={'20%'} rowSpan={3} style={{ textAlign: 'center' }}><span>who</span></td>
+                            <td width={'10%'} rowSpan={3} style={{ paddingLeft: "18px" }}>
 
                                 <Form.Check
                                     label="can teach "
                                     type="radio"
                                     name="abilityGroup"
                                     id="ability-1"
-                                    checked={searchState.abilityId == 1}
+                                    checked={searchState.abilityChoice == 1}
                                     onChange={handleAbilityCheckChanged}
                                 />
                                 <Form.Check
@@ -90,7 +81,7 @@ export default function Main() {
                                     type="radio"
                                     name="abilityGroup"
                                     id="ability-2"
-                                    checked={searchState.abilityId == 2}
+                                    checked={searchState.abilityChoice == 2}
                                     onChange={handleAbilityCheckChanged}
                                 />
                                 <Form.Check
@@ -98,7 +89,7 @@ export default function Main() {
                                     type="radio"
                                     name="abilityGroup"
                                     id="ability-3"
-                                    checked={searchState.abilityId == 3}
+                                    checked={searchState.abilityChoice == 3}
                                     onChange={handleAbilityCheckChanged}
                                 />
 
@@ -111,9 +102,9 @@ export default function Main() {
                                     value={searchState.abilityKeyWords}
                                     isInvalid={!searchState.isAbilityValid}
                                     onChange={(e: any) => {
-                                        let clonedState = Object.assign({}, searchState);
+                                        let clonedState = searchState.clone();
                                         clonedState.abilityKeyWords = e.target.value;
-                                        clonedState.isAbilityValid = clonedState.abilityKeyWords.length > 0;
+                                        clonedState.validateAbility();
                                         setSearchState(clonedState);
                                     }}
                                 />
@@ -126,14 +117,14 @@ export default function Main() {
                     <Table>
                         <tr>
                             <td width={'20%'}><center><span>who</span></center></td>
-                            <td width={'30%'}><span>is located</span></td>
+                            <td width={'10%'}><span>is located</span></td>
                             <td width={'20%'} style={{ paddingLeft: "18px" }}>
                                 <Form.Check
                                     label="Anywhere"
                                     type="radio"
                                     name="locationGroup"
                                     id="location-1"
-                                    checked={searchState.locationId == 1}
+                                    checked={searchState.locationChoice == 1}
                                     onChange={handleLocationCheckChanged}
                                 />
                                 <Form.Check
@@ -141,7 +132,7 @@ export default function Main() {
                                     type="radio"
                                     name="locationGroup"
                                     id="location-2"
-                                    checked={searchState.locationId == 2}
+                                    checked={searchState.locationChoice == 2}
                                     onChange={handleLocationCheckChanged}
                                 />
                                 <Form.Group controlId="countryCtr">
@@ -151,12 +142,12 @@ export default function Main() {
                                         type="text"
                                         placeholder=""
                                         defaultValue=""
-                                        disabled={searchState.locationId == 1}
+                                        disabled={searchState.locationChoice == 1}
                                         isInvalid={!searchState.isCountryValid}
                                         onChange={(e: any) => {
-                                            let clonedState = Object.assign({}, searchState);
+                                            let clonedState = searchState.clone();
                                             clonedState.country = e.target.value;
-                                            clonedState.isCountryValid = clonedState.country.length > 0;
+                                            clonedState.validateCountry();
                                             setSearchState(clonedState);
                                         }}
                                     />
@@ -168,12 +159,12 @@ export default function Main() {
                                         type="text"
                                         placeholder=""
                                         defaultValue=""
-                                        disabled={searchState.locationId == 1}
+                                        disabled={searchState.locationChoice == 1}
                                         isInvalid={!searchState.isRegionValid}
                                         onChange={(e: any) => {
-                                            let clonedState = Object.assign({}, searchState);
+                                            let clonedState = searchState.clone();
                                             clonedState.region = e.target.value;
-                                            clonedState.isRegionValid = clonedState.region.length > 0;
+                                            clonedState.validateRegion();
                                             setSearchState(clonedState);
                                         }}
                                     />
@@ -187,9 +178,8 @@ export default function Main() {
                     <Table>
                         <tr>
                             <td width={'20%'}><center><span>who</span></center></td>
-                            <td width={'30%'}><span>can speak</span></td>
+                            <td width={'10%'}><span>can speak</span></td>
                             <td width={'20%'}>
-                                {/* [TODO] How to render a list with multi-select ability? */}
                                 <Form.Select aria-label="Default select example">
                                     <option value="1">English</option>
                                     <option value="2">Russia</option>
@@ -207,9 +197,8 @@ export default function Main() {
                     <Table>
                         <tr>
                             <td width={'20%'}><center><span>whose</span></center></td>
-                            <td width={'30%'}><span>age is</span></td>
+                            <td width={'10%'}><span>age is</span></td>
                             <td width={'20%'}>
-                                {/* [TODO] How to make a slider with two bounds? */}
                                 <Form.Select aria-label="">
                                     <option value="1">Any</option>
                                     <option value="2">Adolescent</option>
@@ -223,7 +212,7 @@ export default function Main() {
                 </Form>
             </center>
             <Button onClick={handleSubmit}>Search</Button>
-            <SearchResult />
+            {/* <SearchResult results={searchResult} /> */}
         </>
     );
 }
