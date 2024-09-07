@@ -1,10 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson;
 
 namespace WebApi.Database.Entities
 {
     public class UserProfile
     {
-        public int Id { get; set; }
+        public ObjectId Id { get; set; }
 
         public int[] CardIds { get; set; }
 

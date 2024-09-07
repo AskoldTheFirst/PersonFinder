@@ -1,18 +1,23 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
+using MongoDB.Bson;
 
 namespace WebApi.Database.Entities
 {
     public class Card
     {
-        public int Id { get; set; }
+        public ObjectId Id { get; set; }
 
         [Required]
-        public int OwnerId { get; set; }
+        public ObjectId OwnerId { get; set; }
+
+        [Required]
+        public string OwnerLogin { get; set; }
 
         [Required]
         public int AbilityChoice { get; set; }
 
-        public string[] AbilityKeyWords { get; set; }
+        public string AbilityKeyWords { get; set; }
 
         [Required]
         public int LocationChoice { get; set; }
@@ -23,6 +28,9 @@ namespace WebApi.Database.Entities
 
         [Required]
         public int LanguageChoice { get; set; }
+
+        [Required]
+        public string LanguageName { get; set; }
 
         [Required]
         public int AgeChoice { get; set; }

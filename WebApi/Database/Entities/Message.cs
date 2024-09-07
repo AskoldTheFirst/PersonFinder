@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson;
 
 namespace WebApi.Database.Entities
 {
     public class Message
     {
-        public int Id { get; set; }
+        public ObjectId Id { get; set; }
 
         [Required]
         public int FromId { get; set; }

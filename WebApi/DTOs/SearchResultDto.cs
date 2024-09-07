@@ -1,8 +1,10 @@
-﻿namespace WebApi.DTOs
+﻿using MongoDB.Bson;
+
+namespace WebApi.DTOs
 {
     public class SearchResultDto
     {
-        public int CardId { get; set; }
+        public ObjectId CardId { get; set; }
         
         public string Login { get; set; }
 

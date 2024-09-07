@@ -18,6 +18,11 @@ const Search = {
     doSearch: (params: SearchParamsDto) => requests.getWithObject(`search/exact-search`, params),
 }
 
+const Cards = {
+    total: () => requests.get(`card/total`),
+    cards: () => requests.get(`card/cards`),
+}
+
 // const Test = {
 //     initiateNewTest: (technologyName: string) => requests.post(`test/initiate-new-test?techName=${technologyName}`, {}),
 //     answer: (testId: number, questionId: number, answerNumber: number) => requests.post(`test/answer?testId=${testId}&questionId=${questionId}&answerNumber=${answerNumber}`, {}),
@@ -27,7 +32,8 @@ const Search = {
 // }
 
 const http = {
-    Search
+    Search,
+    Cards
 }
 
 export default http;
